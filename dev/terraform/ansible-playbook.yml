@@ -1,0 +1,13 @@
+---
+- name: Setup Apache
+  hosts: localhost
+  connection: local
+  become: yes
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Run the script to isntall  jenkins
+      shell: /home/ubuntu/jenkins.sh

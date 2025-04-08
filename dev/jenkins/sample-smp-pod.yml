@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: expertnetwrk-onboarding-forms-service-template-v2
+spec:
+  containers:
+  - name: maven
+    image: docker.intuit.com/docker-rmt/maven:3.5.3-jdk-11
+    tty: true
+    command: ["cat"]
+  - name: jnlp
+    image: docker.intuit.com/dev/build/ibp/jnlp-slave-with-docker:3.36-2_master_85
+    tty: true
+    args: ["$(JENKINS_SECRET)", "$(JENKINS_AGENT_NAME)", "-url", "$(JENKINS_URL)"]
+  - name: cdtools
+    image: docker.intuit.com/dev/deploy/cd/argocd-utils:stable
+    tty: true
+    command: ["cat"]
+    alwaysPullImage: true
+  - name: servicenow
+    image: docker.intuit.com/coe/servicenow-cr-agent/service/servicenow-cr-agent:latest
+    tty: true
+    command: ["cat"]
+    alwaysPullImage: true
+  - name: test
+    image: docker.intuit.com/oicp/standard/external/maven:3.6-amazoncorretto-11
+    tty: true
+    command: ["cat"]
+    alwaysPullImage: true
+  - name: podman
+    image: docker.intuit.com/oicp/standard/podman:latest
+    tty: true
+    command: [ "cat" ]
+    imagePullPolicy: Always
+    volumeMounts:
+    - name: container-storage
+      mountPath: /var/lib/containers
+    resources:
+      limits:
+        github.com/fuse: 1
+    securityContext:
+      capabilities:
+        add: [ "SYS_ADMIN", "SYS_RESOURCE" ]
+  - name: cpd2
+    image: docker.intuit.com/oicp/standard/cpd2:1
+    tty: true
+    command: ["cat"]
+    imagePullPolicy: Always
+  volumes:
+  - name: container-storage
+    emptyDir: {}

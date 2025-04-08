@@ -1,0 +1,38 @@
+def podTemplateYaml = ''
+
+node {
+    podTemplateYaml = readFile('/home/dev/dev-learning/kubernetes/pod-template.yaml')
+}
+
+pipeline {
+    agent {
+        kubernetes {
+            label 'mypod'
+            yaml podTemplateYaml
+        }
+    }
+    environment {
+        KUBECONFIG = '/var/lib/jenkins/kube-config/config'
+    }
+    stages {
+        stage('Clone Code') {
+            steps {
+                container('maven') {
+                    withCredentials([usernamePassword(credentialsId: 'git-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                        sh 'git clone -b main https://${GIT_USER}:${GIT_PASS}@github.com/devrathoree/jenkins-testing.git app'
+                    }
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                container('maven') {
+                    dir('app') {
+                        sh 'mvn clean install'
+                    }
+                }
+            }
+        }
+    }
+}

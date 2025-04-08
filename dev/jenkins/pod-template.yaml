@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins: slave
+spec:
+  containers:
+  - name: maven
+    image: maven:3.8.5-openjdk-11
+    command:
+    - cat
+    tty: true
+  - name: jnlp
+    image: jenkins/inbound-agent
+    args:
+    - $(JENKINS_SECRET)
+    - $(JENKINS_NAME)
